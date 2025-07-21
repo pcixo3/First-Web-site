@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ car.title }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f9fc;
+            padding: 30px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .car-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        .car-info {
+            padding: 20px;
+        }
+        h1 {
+            margin-top: 0;
+            color: #004080;
+        }
+        .price {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .action-buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .action-buttons a,
+        .action-buttons button {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+        .back {
+            background-color: #004080;
+            color: white;
+        }
+        .back:hover {
+            background-color: #003060;
+        }
+        .edit {
+            background-color: #e6a100;
+            color: white;
+        }
+        .edit:hover {
+            background-color: #c58e00;
+        }
+        .delete-button {
+            background-color: #cc0000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+        .delete-button:hover {
+            background-color: #990000;
+        }
+        /* Чтобы форма с кнопкой удаления не разрывала flex */
+        .action-buttons form {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        {% if car.image %}
+            <img src="{{ car.image.url }}" alt="{{ car.title }}" class="car-image">
+        {% else %}
+            <img src="{% static 'images/default-car.jpg' %}" alt="default" class="car-image">
+        {% endif %}
+
+        <div class="car-info">
+            <h1>{{ car.title }}</h1>
+            <p class="price">{{ car.price }} $</p>
+            <p><strong>Модель:</strong> {{ car.model }}</p>
+            <p><strong>Категория:</strong> {{ car.category.title }}</p>
+            <p><strong>Год выпуска:</strong> {{ car.year }}</p>
+            <p><strong>Описание:</strong> {{ car.description }}</p>
+
+            <div class="action-buttons">
+                <a href="{% url 'index' %}" class="back">← Назад ко всем автомобилям</a>
+                <a href="{% url 'car_update' car.id %}" class="edit">Изменить</a>
+
+                <form action="{% url 'car_delete' car.id %}" method="POST" onsubmit="return confirm('Вы точно хотите удалить этот автомобиль?');">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-button">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить авто</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7fa;
+            padding: 50px;
+        }
+
+        .form-container {
+            background: white;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            background-color: #e61515;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #c21212;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2 style="text-align:center;">Добавить автомобиль</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Название:</label>
+        <input type="text" name="title" required>
+
+        <label>Категория:</label>
+        <select name="category_id" required>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.title }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Модель:</label>
+        <input type="text" name="model" required>
+
+        <label>Год:</label>
+        <input type="number" name="year" required>
+
+        <label>Цена:</label>
+        <input type="number" name="price" step="0.01" required>
+
+        <label>Изображение:</label>
+        <input type="file" name="image">
+
+        <label>Описание:</label>
+        <input type="text" name="description">
+
+        <button type="submit">Сохранить</button>
+    </form>
+
+    <a href="{% url 'index' %}" class="back-link">← Назад к списку авто</a>
+</div>
+
+</body>
+</html>
