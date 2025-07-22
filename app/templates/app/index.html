@@ -4,6 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <title>Автосалон — Продажа автомобилей</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,6 +18,10 @@
             margin: 0;
             padding: 0;
             color: #333;
+        }
+
+        main {
+            padding: 0 30px 40px;
         }
 
         header {
@@ -45,15 +56,12 @@
             transition: background 0.3s ease, transform 0.2s ease;
             cursor: pointer;
             display: inline-block;
+            margin: 0 8px;
         }
 
         .add-btn:hover {
             background-color: #c21212;
             transform: translateY(-2px);
-        }
-
-        main {
-            padding: 0 30px 40px;
         }
 
         .car-list {
@@ -127,16 +135,107 @@
             font-size: 1.2rem;
             color: #888;
         }
+
+        .user-info {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #messages-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 300px;
+        }
+
+        #messages-container .alert {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
 
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'about_us' %}">О нас - "Mashina.nur"</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
+      aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'car_create' %}">Добавить авто</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Войти</a>
+          </li>
+        {% endif %}
+      </ul>
+      <form class="d-flex" role="search" method="GET" action="{% url 'index' %}">
+        <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search" name="q" value="{{ request.GET.q }}">
+        <button class="btn btn-outline-success" type="submit">Поиск</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+{% if messages %}
+  <div id="messages-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+    setTimeout(() => {
+      const container = document.getElementById('messages-container');
+      if (container) {
+        container.style.transition = 'opacity 0.5s ease-out';
+        container.style.opacity = '0';
+        setTimeout(() => container.remove(), 500);
+      }
+    }, 7000);
+  </script>
+{% endif %}
+
 <header>
-    <h1>Автосалон — NURS-AUTO</h1>
+    <h1>Mashina.nur</h1>
 </header>
 
 <div class="top-actions">
-    <a href="{% url 'car_create' %}" class="add-btn">+ Добавить авто</a>
+    {% if request.user.is_authenticated %}
+        <a href="{% url 'car_create' %}" class="add-btn">+ Добавить авто</a>
+    {% endif %}
+</div>
+
+<div class="user-info">
+    {% if request.user.is_authenticated %}
+        <i class="bi bi-person-circle" style="font-size: 1.5rem; color: #e61515;"></i>
+        <span>{{ request.user.username }}</span>
+    {% else %}
+        <i class="bi bi-exclamation-circle" style="font-size: 1.5rem; color: #999;"></i>
+        <span>Вам нужно войти в систему</span>
+    {% endif %}
 </div>
 
 <main>
@@ -151,17 +250,22 @@
                     {% endif %}
                     <div class="car-details">
                         <h2 class="car-title">{{ car.title }}</h2>
-                        <div class="car-price">💵 {{ car.price }} $</div>
+                        <div class="car-price">
+                        <p><i class="bi bi-cash"></i> {{ car.price }} $</p>
+                </div>
 
                         <div class="car-icons">
                             <div class="car-icon-item">
-                                <span>🛠</span> Модель: {{ car.model }}
+                                <p><strong><i class="bi bi-car-front-fill"></i> Модель:</strong> {{ car.model }}</p>
                             </div>
                             <div class="car-icon-item">
-                                <span>📅</span> Год: {{ car.year }}
+                                <p><strong><i class="bi bi-calendar-range-fill"></i> Год:</strong> {{ car.year }}</p>
                             </div>
                             <div class="car-icon-item">
-                                <span>🏷</span> Категория: {{ car.category }}
+                                <p><strong><i class="bi bi-tag-fill"></i> Категория:</strong> {{ car.category }}</p>
+                            </div>
+                            <div class="car-icon-item">
+                                <p><strong><i class="bi bi-person-circle"></i> Владелец:</strong> {{ car.user.username }}</p>
                             </div>
                         </div>
                     </div>
@@ -174,6 +278,8 @@
         </div>
     {% endif %}
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
